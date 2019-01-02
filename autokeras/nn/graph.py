@@ -666,7 +666,8 @@ class TorchModel(torch.nn.Module):
 
     def forward(self, input_tensor):
         topo_node_list = self.graph.topological_order
-        output_id = topo_node_list[-1]
+        output_index = -1 if not hasattr(self, "output_index") else self.output_index
+        output_id = topo_node_list[output_index]
         input_id = topo_node_list[0]
 
         node_list = deepcopy(self.graph.node_list)

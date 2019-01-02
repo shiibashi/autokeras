@@ -247,7 +247,7 @@ class PortableImageSupervised(PortableClass):
         self.inverse_transform_y_method = inverse_transform_y_method
         self.resize_shape = resize_params
 
-    def predict(self, x_test):
+    def predict(self, x_test, output_index=-1):
         """Return predict results for the testing data.
 
         Args:
@@ -262,14 +262,16 @@ class PortableImageSupervised(PortableClass):
         test_loader = self.data_transformer.transform_test(x_test)
         model = self.graph.produce_model()
         model.eval()
-
+        model.output_index = output_index
         outputs = []
         with torch.no_grad():
             for index, inputs in enumerate(test_loader):
                 outputs.append(model(inputs).numpy())
         output = reduce(lambda x, y: np.concatenate((x, y)), outputs)
-        return self.inverse_transform_y(output)
-
+        if output_index == -1:
+            return self.inverse_transform_y(output)
+        else:
+            return output
     def inverse_transform_y(self, output):
         return self.inverse_transform_y_method(output)
 
